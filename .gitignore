@@ -1,0 +1,9 @@
+*
+
+# Allow project files, Git files, build system, and source.
+!.gitignore
+!README.md
+!LICENSE.md
+!Makefile
+!*.h
+!*.c

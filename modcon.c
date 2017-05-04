@@ -5,11 +5,17 @@
 #define handle_error(m) \
 	do { perror(m); exit(EXIT_FAILURE); } while (0);
 
+// Possible invocations:
+//   `modcon r <addr>` => <value>
+//   `modcon r <addr> <value> [<value>]*
+//   `modcon c <addr>` => <value>
+//   `modcon c <addr> <value> [<value>]*
+
 int
 main(int argc, char *argv[])
 {
 	modbus_t *mb;
-	uint16_t reg[32],
+	uint16_t reg[64],
 			 loc = 0;
 			 val = 0;
 	

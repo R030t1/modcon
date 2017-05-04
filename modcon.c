@@ -7,9 +7,9 @@
 
 // Possible invocations:
 //   `modcon r <addr>` => <value>
-//   `modcon r <addr> <value> [<value>]*
+//   `modcon r <addr> <value> [<value>]*`
 //   `modcon c <addr>` => <value>
-//   `modcon c <addr> <value> [<value>]*
+//   `modcon c <addr> <value> [<value>]*`
 
 int
 main(int argc, char *argv[])

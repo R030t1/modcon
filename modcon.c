@@ -11,14 +11,22 @@
 //   `modcon c <addr>` => <value>
 //   `modcon c <addr> <value> [<value>]*`
 
+enum mode { REGISTER, COIL };
+
 int
 main(int argc, char *argv[])
 {
+	enum mode type;
 	modbus_t *mb;
 	uint16_t reg[64],
-			 loc = 0;
+			 loc = 0,
 			 val = 0;
-	
+
+	(void)type;
+	(void)reg;
+	(void)loc;
+	(void)val;
+
 	mb = modbus_new_tcp(argv[1], MODBUS_TCP_DEFAULT_PORT);
 	if (!mb)
 		handle_error("modbus_new_tcp");
@@ -42,5 +50,4 @@ main(int argc, char *argv[])
 	modbus_free(mb);
 
 	return EXIT_SUCCESS;
-}
 }

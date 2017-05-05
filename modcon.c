@@ -13,6 +13,14 @@
 
 enum mode { REGISTER, COIL };
 
+void
+print_help()
+{
+	// TODO.
+	printf("modcon [r|c] <addr> [value]*");
+	exit(1);
+}
+
 int
 main(int argc, char *argv[])
 {

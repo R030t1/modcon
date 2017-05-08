@@ -1,6 +1,6 @@
 CC=gcc
 CF=-std=c11 -Wall -Werror -pedantic
-LF=-L/usr/lib/x86_64-linux-gnu -lmodbus
+LF=-L/usr/lib/x86_64-linux-gnu -L/usr/local/lib -lmodbus
 
 SRC=$(wildcard *.c)
 OBJ=${SRC:.c=.o}

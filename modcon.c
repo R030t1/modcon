@@ -18,7 +18,7 @@ void
 print_help()
 {
 	// TODO.
-	printf("modcon [r|c] <addr> [value]*");
+	printf("modcon <host> [r|c] <addr> [value]*");
 	exit(1);
 }
 

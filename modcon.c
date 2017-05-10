@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 	
 	addr = atoi(argv[3]);
 	
-	if (argc >= 4) {
+	if (argc > 4) {
 		op = WRITE;
 		regs[0] = atoi(argv[4]);
 		coils[0] = atoi(argv[4]) ? 1 : 0;

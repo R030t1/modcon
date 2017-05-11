@@ -11,7 +11,7 @@
 //   `modcon <host> c <addr>` => <value>
 //   `modcon <host> c <addr> [<value>]+`
 
-enum mode { REGISTER, COIL };
+enum mode { REGISTER, COIL, ERROR };
 enum operation { READ, WRITE };
 
 void
@@ -28,12 +28,12 @@ main(int argc, char *argv[])
 	char *host;
 	enum mode type;
 	enum operation op;
-	int addr;
-	uint16_t regs[64];
-	uint8_t coils[64];
+	int addr = 0;
+	uint16_t regs[64] = {0};
+	uint8_t coils[64] = {0};
 	modbus_t *mb;
 
-	if (argc < 4)
+	if (argc < 3)
 		print_help();
 	
 	host = argv[1];
@@ -42,10 +42,15 @@ main(int argc, char *argv[])
 		type = REGISTER;
 	else if (argv[2][0] == 'c')
 		type = COIL;
+	else if (argv[2][0] == 'e')
+		type = ERROR;
 	else
 		print_help();
 	
-	addr = atoi(argv[3]);
+	if (type != ERROR && argc < 4)
+		print_help();
+	else if (argc > 3)
+		addr = atoi(argv[3]);
 	
 	if (argc > 4) {
 		op = WRITE;
@@ -54,10 +59,10 @@ main(int argc, char *argv[])
 	}
 	else op = READ;
 	
-	printf("host : \"%s\"\n", host);
-	printf("type : %s\n", type == REGISTER ? "register" : "coil");
-	printf("addr : %i\n", addr);
-	printf("regs : %i\n", regs[0]);
+	//printf("host : \"%s\"\n", host);
+	//printf("type : %s\n", type == REGISTER ? "register" : "coil");
+	//printf("addr : %i\n", addr);
+	//printf("regs : %i\n", regs[0]);
 	
 	mb = modbus_new_tcp(host, MODBUS_TCP_DEFAULT_PORT);
 	if (!mb)
@@ -101,6 +106,29 @@ main(int argc, char *argv[])
 				handle_error("modbus_write_bit");
 			}
 		}
+	}
+	else if (type == ERROR) {
+		uint8_t raw[] = {0xFF, 0x07};
+		uint8_t rsp[MODBUS_TCP_MAX_ADU_LENGTH];
+		int n;
+		
+		printf("Error read.\n");
+		n = modbus_send_raw_request(mb, raw, sizeof(raw));
+		if (n == -1) {
+			modbus_close(mb);
+			modbus_free(mb);
+			handle_error("modbus_send_raw_request");
+		}
+		
+		n = modbus_receive_confirmation(mb, rsp);
+		if (n == -1) {
+			modbus_close(mb);
+			modbus_free(mb);
+			handle_error("modbus_receive_confirmation");
+		}
+		
+		for(int i = 0; i < n; i++)
+			printf("%x\n", rsp[i]);
 	}
 	
 	//if (modbus_write_register(mb, 0, val) == -1) {

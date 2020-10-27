@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <modbus/modbus.h>
 
 #define handle_error(m) \
@@ -25,7 +27,8 @@ print_help()
 int
 main(int argc, char *argv[])
 {
-	char *host;
+	char *host, *portstr;
+    int port = 0;
 	enum mode type;
 	enum operation op;
 	int addr = 0;
@@ -36,8 +39,20 @@ main(int argc, char *argv[])
 	if (argc < 3)
 		print_help();
 	
-	host = argv[1];
-	
+    char *sep = NULL;
+    host = argv[1];
+    if ((sep = strchr(host, ':')))
+    {
+        *sep = 0;
+        portstr = sep + 1;
+        port = atoi(portstr);
+    }
+    
+    if (!port)
+    {
+        port = MODBUS_TCP_DEFAULT_PORT;
+    }
+        
 	if (argv[2][0] == 'r')
 		type = REGISTER;
 	else if (argv[2][0] == 'c')
@@ -64,7 +79,7 @@ main(int argc, char *argv[])
 	//printf("addr : %i\n", addr);
 	//printf("regs : %i\n", regs[0]);
 	
-	mb = modbus_new_tcp(host, MODBUS_TCP_DEFAULT_PORT);
+	mb = modbus_new_tcp(host, port);
 	if (!mb)
 		handle_error("modbus_new_tcp");
 
@@ -75,9 +90,11 @@ main(int argc, char *argv[])
 
 	if (type == REGISTER) {
 		if (op == READ) {
-			if (modbus_read_registers(mb, addr, 1, regs) == -1) {
+			int rc = modbus_read_registers(mb, addr, 1, regs);
+			if (rc == -1) {
 				modbus_close(mb);
 				modbus_free(mb);
+				printf("%s\n", modbus_strerror(errno));
 				handle_error("modbus_read_registers");
 			}
 			printf("%i\n", regs[0]);
